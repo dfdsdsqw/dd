@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/quartz/bootstrap.min.css" rel="stylesheet"></head>
+<body>
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'task_list' %}">Task Tracker</a>
+        {% if user.is_authenticated %}
+            <span class="text-white me-3">{{ user.username }}</span>
+            <form method="post" action="{% url 'logout' %}" class="d-inline">
+                {% csrf_token %}
+                <button class="btn btn-outline-light btn-sm">Вийти</button>
+            </form>
+        {% else %}
+            <a class="btn btn-outline-light btn-sm me-2" href="{% url 'login' %}">Увійти</a>
+            <a class="btn btn-outline-light btn-sm" href="{% url 'register' %}">Реєстрація</a>
+        {% endif %}
+    </div>
+</nav>
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>

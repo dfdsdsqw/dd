@@ -1,0 +1,42 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<h2>Мої завдання</h2>
+<a href="{% url 'task_create' %}" class="btn btn-primary mb-3">+ Нове завдання</a>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="status" class="form-select">
+            <option value="">Всі статуси</option>
+            <option value="todo">To Do</option>
+            <option value="in_progress">In Progress</option>
+            <option value="done">Done</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="priority" class="form-select">
+            <option value="">Всі пріоритети</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-secondary">Фільтр</button>
+    </div>
+</form>
+
+<ul class="list-group">
+{% for task in tasks %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a>
+        <span>
+            <span class="badge bg-info">{{ task.get_status_display }}</span>
+            <span class="badge bg-warning text-dark">{{ task.get_priority_display }}</span>
+        </span>
+    </li>
+{% empty %}
+    <li class="list-group-item">Завдань поки немає.</li>
+{% endfor %}
+</ul>
+{% endblock %}

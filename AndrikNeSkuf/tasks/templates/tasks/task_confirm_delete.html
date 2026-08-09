@@ -1,0 +1,12 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<h2>Видалити завдання?</h2>
+<p>Ви впевнені, що хочете видалити завдання «{{ task.title }}»? Цю дію не можна скасувати.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Так, видалити</button>
+    <a href="{% url 'task_detail' task.pk %}" class="btn btn-secondary">Скасувати</a>
+</form>
+{% endblock %}
