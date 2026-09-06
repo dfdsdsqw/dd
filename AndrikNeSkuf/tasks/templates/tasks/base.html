@@ -3,8 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <title>Task Tracker</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/quartz/bootstrap.min.css" rel="stylesheet"></head>
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/quartz/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Оверлей для блокування екрана в портретному режимі */
+        #orientation-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #0f172a;
+            color: #ffffff;
+            z-index: 99999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .warning-content {
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Анімована SVG-іконка */
+        .rotate-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            stroke: #38bdf8;
+            animation: rotateAnim 2s infinite ease-in-out;
+        }
+
+        .warning-content h2 {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 22px;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .warning-content p {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            color: #94a3b8;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        @keyframes rotateAnim {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Показувати оверлей тільки при портретній орієнтації на мобільних і планшетах */
+        @media screen and (orientation: portrait) and (max-width: 1024px) {
+            #orientation-warning {
+                display: flex !important;
+            }
+            body {
+                overflow: hidden !important;
+            }
+        }
+    </style>
+</head>
 <body>
+
+<!-- Блок заблокування для вертикального режиму -->
+<div id="orientation-warning">
+  <div class="warning-content">
+    <svg class="rotate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+      <path d="M12 18h.01"></path>
+      <path d="M19 9l3 3-3 3"></path>
+      <path d="M5 15l-3-3 3-3"></path>
+    </svg>
+    <h2>Please Rotate Your Device</h2>
+    <p>This website is best viewed in landscape mode.</p>
+  </div>
+</div>
+
 <nav class="navbar navbar-dark bg-dark mb-4">
     <div class="container">
         <a class="navbar-brand" href="{% url 'task_list' %}">Task Tracker</a>
@@ -20,8 +105,10 @@
         {% endif %}
     </div>
 </nav>
+
 <div class="container">
     {% block content %}{% endblock %}
 </div>
+
 </body>
 </html>
