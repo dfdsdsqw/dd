@@ -1,0 +1,147 @@
+{% extends 'restaurant/base.html' %}
+{% load l10n %}
+{% block content %}
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="top">
+    <div class="container">
+        <h1>BUBBLE ME</h1>
+        <p>{% if lang == 'en' %}Fresh bubble tea made with love in Chernivtsi{% else %}Свіжий бабл-ті, зроблений з любов'ю у Чернівцях{% endif %}</p>
+        <a href="#menu" class="btn-bubble">{% if lang == 'en' %}View menu{% else %}Переглянути меню{% endif %}</a>
+    </div>
+</section>
+
+<!-- ===== ПРО НАС ===== -->
+<section class="section" id="about">
+    <div class="container">
+        <h2 class="section-title">{% if lang == 'en' %}About us{% else %}Про нас{% endif %}</h2>
+        {% if about %}
+            <div class="about-box">{{ about.text|linebreaksbr }}</div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ===== МЕНЮ ===== -->
+<section class="section" id="menu">
+    <div class="container">
+        <h2 class="section-title">{% if lang == 'en' %}Menu{% else %}Меню{% endif %}</h2>
+
+        {% if categories %}
+        <div class="menu-tabs">
+            {% for cat in categories %}
+                <button type="button" class="menu-tab {% if forloop.first %}active{% endif %}"
+                        data-target="cat-{{ cat.pk }}">{{ cat.name }}</button>
+            {% endfor %}
+        </div>
+
+        {% for cat in categories %}
+        <div class="menu-panel {% if forloop.first %}active{% endif %}" id="cat-{{ cat.pk }}">
+            <div class="row g-4">
+                {% for item in cat.items.all %}
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="menu-card" data-id="{{ item.pk }}" data-title="{{ item.title }}"
+                         data-desc="{{ item.description }}"
+                         data-img="{% if item.image %}{{ item.image.url }}{% endif %}"
+                         {% if not item.variants.all and item.price %}data-price="{{ item.price|unlocalize }}"{% endif %}>
+                        <div class="add-btn">+</div>
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                        {% else %}
+                            <div class="img-placeholder">🥤</div>
+                        {% endif %}
+                        <div class="card-body-custom">
+                            <h3>{{ item.title }}</h3>
+                            {% if item.description %}<p>{{ item.description }}</p>{% endif %}
+
+                            {% if item.variants.all %}
+                                <ul class="variants">
+                                    {% for v in item.variants.all %}
+                                    <li class="variant-row" data-id="{{ v.pk }}" data-name="{{ v.name }}" data-price="{{ v.price|unlocalize }}">
+                                        <span>{{ v.name|default:"" }}</span>
+                                        <span class="price">{{ v.price|floatformat:"-2" }} {% if lang == 'en' %}UAH{% else %}грн{% endif %}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% elif item.price %}
+                                <div class="price price-single">{{ item.price|floatformat:"-2" }} {% if lang == 'en' %}UAH{% else %}грн{% endif %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-center">{% if lang == 'en' %}No items in this category yet.{% else %}У цій категорії поки немає позицій.{% endif %}</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+            <p class="text-center">{% if lang == 'en' %}The menu is coming soon.{% else %}Меню скоро з'явиться.{% endif %}</p>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ===== НОВИНИ ===== -->
+<section class="section" id="news">
+    <div class="container">
+        <h2 class="section-title">{% if lang == 'en' %}News & offers{% else %}Новини та акції{% endif %}</h2>
+        <div class="row g-4">
+            {% for n in news_list %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="news-card">
+                    <a class="stretched" href="{% url 'news_detail' n.pk %}">
+                        {% if n.image %}
+                            <img src="{{ n.image.url }}" alt="{{ n.title }}">
+                        {% else %}
+                            <div class="img-placeholder">🎉</div>
+                        {% endif %}
+                        <div class="card-body-custom">
+                            <div class="news-date">{{ n.created_at|date:"d.m.Y" }}</div>
+                            <h3>{{ n.title }}</h3>
+                            <p>{{ n.content|truncatewords:18 }}</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center">{% if lang == 'en' %}No news yet.{% else %}Новин поки немає.{% endif %}</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ===== КОНТАКТИ ===== -->
+<section class="section" id="contacts">
+    <div class="container">
+        <h2 class="section-title">{% if lang == 'en' %}Contacts{% else %}Контакти{% endif %}</h2>
+        {% if contact %}
+        <div class="contact-box">
+            <p>📍 {{ contact.address }}</p>
+            <p>📞 <a href="tel:{{ contact.phone }}">{{ contact.phone }}</a></p>
+            <div class="contact-links">
+                {% if contact.google_maps_link %}
+                    <a class="btn-bubble" href="{{ contact.google_maps_link }}" target="_blank" rel="noopener">{% if lang == 'en' %}Open in Google Maps{% else %}Відкрити в Google Maps{% endif %}</a>
+                {% endif %}
+                {% if contact.instagram_link %}
+                    <a class="btn-bubble" href="{{ contact.instagram_link }}" target="_blank" rel="noopener">Instagram</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Перемикання категорій меню
+    document.querySelectorAll('.menu-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            document.querySelectorAll('.menu-tab').forEach(function (t) { t.classList.remove('active'); });
+            document.querySelectorAll('.menu-panel').forEach(function (p) { p.classList.remove('active'); });
+            tab.classList.add('active');
+            document.getElementById(tab.dataset.target).classList.add('active');
+        });
+    });
+</script>
+{% endblock %}
