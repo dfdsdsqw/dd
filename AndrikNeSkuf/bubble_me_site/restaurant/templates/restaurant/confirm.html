@@ -1,0 +1,21 @@
+{% extends 'restaurant/base.html' %}
+
+{% block title %}BUBBLE ME{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="confirm-box">
+            {% if ok %}
+                <div class="done-mark">✓</div>
+                <h1>{% if lang == 'en' %}Email confirmed{% else %}Пошту підтверджено{% endif %}</h1>
+                <p>{% if lang == 'en' %}Thank you! Next time we will fill in your details in the order form automatically.{% else %}Дякуємо! Наступного разу ми самі заповнимо ваші дані у формі замовлення.{% endif %}</p>
+            {% else %}
+                <h1>{% if lang == 'en' %}The link is not valid{% else %}Посилання недійсне{% endif %}</h1>
+                <p>{% if lang == 'en' %}It may have expired. Place a new order and we will send a fresh link.{% else %}Можливо, його термін минув. Зробіть нове замовлення, і ми надішлемо свіже посилання.{% endif %}</p>
+            {% endif %}
+            <a class="btn-bubble" href="{% url 'home' %}">{% if lang == 'en' %}Back to the site{% else %}Повернутися на сайт{% endif %}</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

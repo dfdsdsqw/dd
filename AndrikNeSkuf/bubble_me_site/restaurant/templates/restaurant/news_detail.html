@@ -1,0 +1,20 @@
+{% extends 'restaurant/base.html' %}
+
+{% block title %}{{ news.title }} — BUBBLE ME{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container news-detail">
+        <a href="{% url 'home' %}#news" class="back-link">← {% if lang == 'en' %}Back to home{% else %}Назад до головної{% endif %}</a>
+
+        <h1>{{ news.title }}</h1>
+        <div class="news-date">{{ news.created_at|date:"d.m.Y" }}</div>
+
+        {% if news.image %}
+            <img src="{{ news.image.url }}" alt="{{ news.title }}">
+        {% endif %}
+
+        <div class="content">{{ news.content }}</div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | BUBBLE ME{% endblock %}
+
+{% block extrahead %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'restaurant/css/admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:"BUBBLE ME" }}</a></div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block footer %}{{ block.super }}
+<script>
+// Список замовлень сам оновлюється раз на 30 секунд, щоб нові з'являлися без F5
+(function () {
+    var b = document.body.classList;
+    if (!(b.contains('change-list') && b.contains('model-order'))) return;
+    setInterval(function () {
+        var busy = document.querySelector('input:focus, select:focus, textarea:focus') ||
+                   document.querySelector('.action-select:checked');
+        if (!busy && !document.hidden) location.reload();
+    }, 30000);
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}BUBBLE ME{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="{% static 'restaurant/css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="{% url 'home' %}">BUBBLE ME</a>
+
+        <nav class="main-nav" id="mainNav" aria-label="Menu">
+            <a href="{% url 'home' %}">{% if lang == 'en' %}Home{% else %}Головна{% endif %}</a>
+            <a href="{% url 'home' %}#about">{% if lang == 'en' %}About us{% else %}Про нас{% endif %}</a>
+            <a href="{% url 'home' %}#menu">{% if lang == 'en' %}Menu{% else %}Меню{% endif %}</a>
+            <a href="{% url 'home' %}#news">{% if lang == 'en' %}News{% else %}Новини{% endif %}</a>
+            <a href="{% url 'home' %}#contacts">{% if lang == 'en' %}Contacts{% else %}Контакти{% endif %}</a>
+        </nav>
+
+        <div class="header-tools">
+            <button type="button" class="cart-btn" id="cartToggle" aria-expanded="false">
+                <span>{% if lang == 'en' %}Cart{% else %}Кошик{% endif %}</span>
+                <span class="cart-count" id="cartCount" hidden>0</span>
+            </button>
+            <div class="lang-switch">
+                <a href="?lang=uk" class="{% if lang == 'uk' %}active{% endif %}">UA</a>
+                <span>|</span>
+                <a href="?lang=en" class="{% if lang == 'en' %}active{% endif %}">EN</a>
+            </div>
+        </div>
+
+        <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</header>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container text-center">
+        <div class="footer-brand">BUBBLE ME</div>
+        {% if contact and contact.instagram_link %}
+            <p><a href="{{ contact.instagram_link }}" target="_blank" rel="noopener">Instagram</a></p>
+        {% endif %}
+        <p class="copyright">© {% now "Y" %} BUBBLE ME, {% if lang == 'en' %}Chernivtsi{% else %}Чернівці{% endif %}</p>
+    </div>
+</footer>
+
+<!-- Вікно позиції меню -->
+<div class="overlay" id="itemOverlay" hidden>
+    <div class="dialog" role="dialog" aria-modal="true">
+        <button type="button" class="close-x" data-close aria-label="Close">×</button>
+        <div id="itemBody"></div>
+    </div>
+</div>
+
+<!-- Кошик на весь екран -->
+<div class="cart-window" id="cartWindow" role="dialog" aria-label="Cart" hidden>
+    <div class="cart-head">
+        <div class="cart-head-inner">
+            <button type="button" class="back-btn" id="cartBack" hidden>← {% if lang == 'en' %}Back{% else %}Назад{% endif %}</button>
+            <h2 id="cartTitle">{% if lang == 'en' %}Cart{% else %}Кошик{% endif %}</h2>
+            <button type="button" class="close-x" id="cartClose" aria-label="Close">×</button>
+        </div>
+    </div>
+
+    <div class="cart-body" id="cartBody">
+        <div class="cart-inner">
+
+            <!-- Крок 1: список -->
+            <div id="cartView">
+                <div class="cart-items" id="cartItems"></div>
+            </div>
+
+            <!-- Крок 2: оформлення -->
+            <form class="checkout-form" id="checkoutForm" data-url="{% url 'create_order' %}" data-status-url="{% url 'order_status' %}" hidden novalidate>
+                {% csrf_token %}
+
+                <div class="profile-note" id="profileNote" hidden>
+                    <span>✓ {% if lang == 'en' %}We filled in your confirmed details{% else %}Ми підставили ваші підтверджені дані{% endif %}</span>
+                    <button type="button" id="profileClear">{% if lang == 'en' %}Not you? Clear{% else %}Не ви? Очистити{% endif %}</button>
+                </div>
+
+                <div class="field">
+                    <label for="f_name">{% if lang == 'en' %}Your name{% else %}Ваше ім'я{% endif %}</label>
+                    <input type="text" id="f_name" name="name" maxlength="100" autocomplete="name">
+                    <div class="field-error" data-error="name" hidden></div>
+                </div>
+
+                <div class="field">
+                    <label for="f_phone">{% if lang == 'en' %}Phone number{% else %}Номер телефону{% endif %}</label>
+                    <input type="tel" id="f_phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="+380 __ ___ __ __">
+                    <div class="field-error" data-error="phone" hidden></div>
+                </div>
+
+                <div class="field">
+                    <label for="f_email">Email</label>
+                    <input type="email" id="f_email" name="email" maxlength="254" autocomplete="email">
+                    <div class="field-error" data-error="email" hidden></div>
+                </div>
+
+                <div class="field">
+                    <label for="f_comment">{% if lang == 'en' %}Comment{% else %}Коментар{% endif %} <span class="opt-hint">({% if lang == 'en' %}optional{% else %}необов'язково{% endif %})</span></label>
+                    <textarea id="f_comment" name="comment" maxlength="1000"></textarea>
+                </div>
+
+                <input type="text" name="hp_x7" id="f_hp" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                <div class="order-summary" id="orderSummary"></div>
+                <div class="form-error" id="formError" hidden></div>
+            </form>
+
+            <!-- Крок 3: готово -->
+            <div class="done-view" id="doneView" hidden>
+                <div class="done-mark">✓</div>
+                <h3>{% if lang == 'en' %}Thank you! Your order is placed{% else %}Дякуємо! Замовлення прийнято{% endif %}</h3>
+                <p>{% if lang == 'en' %}Order No.{% else %}Номер замовлення:{% endif %} <strong id="doneNumber"></strong></p>
+                <p id="doneMail"></p>
+                <p>{% if lang == 'en' %}Follow the status of your order in the card at the bottom of the page.{% else %}Статус замовлення видно в картці внизу сторінки.{% endif %}</p>
+                <button type="button" class="btn-bubble" data-close-cart>{% if lang == 'en' %}Back to the site{% else %}Повернутися на сайт{% endif %}</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="cart-foot" id="cartFoot" hidden>
+        <div class="cart-inner cart-foot-inner">
+            <div class="cart-total">
+                <span>{% if lang == 'en' %}Total{% else %}Разом{% endif %}</span>
+                <strong id="cartTotal">0</strong>
+            </div>
+            <button type="button" class="btn-bubble" id="cartOrderBtn">
+                {% if lang == 'en' %}Place order{% else %}Оформити замовлення{% endif %}
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Відстеження замовлення -->
+<aside class="tracker" id="tracker" hidden aria-live="polite">
+    <div id="trackerList"></div>
+</aside>
+
+<script src="{% static 'restaurant/js/cart.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
